@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import { existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db, rowToUserProfile, rowToBook, rowToStore, ADMIN_EMAIL } from './db.js';
@@ -349,6 +352,21 @@ app.get('/api/print-requests/:id/file', requireAuth, requireAdmin, (req, res) =>
 });
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+// ---------- Serve React build in production ----------
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const distPath = join(__dirname, '../dist');
+
+if (existsSync(distPath)) {
+  app.use(express.static(distPath));
+  // SPA catch-all: any route not matched above returns index.html
+  app.get('*', (_req, res) => {
+    res.sendFile(join(distPath, 'index.html'));
+  });
+  console.log(`Serving static files from ${distPath}`);
+} else {
+  console.log('No dist/ folder found — run "npm run build" to generate it.');
+}
 
 app.listen(PORT, () => {
   console.log(`Metabook API running on http://localhost:${PORT}`);
