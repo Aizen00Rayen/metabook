@@ -1,0 +1,6 @@
+{
+  "name": "Metabook",
+  "description": "Premium multi-vendor digital book marketplace",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
